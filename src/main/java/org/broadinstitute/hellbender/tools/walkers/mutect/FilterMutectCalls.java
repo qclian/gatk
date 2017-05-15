@@ -88,6 +88,8 @@ public final class FilterMutectCalls extends VariantWalker {
         GATKVCFConstants.MUTECT_FILTER_NAMES.stream().map(GATKVCFHeaderLines::getFilterLine).forEach(headerLines::add);
 
         headerLines.addAll(getDefaultToolVCFHeaderLines());
+        headerLines.add(new VCFFilterHeaderLine(Mutect2FilteringEngine.DUPLICATED_EVIDENCE_FILTER_NAME, "evidence for alt allele is overrepresented by apparent duplicates"));
+
         final VCFHeader vcfHeader = new VCFHeader(headerLines, inputHeader.getGenotypeSamples());
         vcfWriter = createVCFWriter(new File(outputVcf));
         vcfWriter.writeHeader(vcfHeader);

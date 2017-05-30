@@ -18,7 +18,7 @@ import org.broadinstitute.hellbender.tools.spark.sv.SVFastqUtils.FastqRead;
 import org.broadinstitute.hellbender.tools.spark.utils.*;
 import org.broadinstitute.hellbender.utils.bwa.BwaMemAligner;
 import org.broadinstitute.hellbender.utils.bwa.BwaMemAlignment;
-import org.broadinstitute.hellbender.utils.bwa.BwaMemIndexSingleton;
+import org.broadinstitute.hellbender.utils.bwa.BwaMemIndexCache;
 import org.broadinstitute.hellbender.utils.fermi.FermiLiteAssembler;
 import org.broadinstitute.hellbender.utils.fermi.FermiLiteAssembly;
 import org.broadinstitute.hellbender.utils.gcs.BucketUtils;
@@ -30,7 +30,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
  * Tool to discover reads that support a hypothesis of a genomic breakpoint.
@@ -416,7 +415,7 @@ public final class FindBreakpointEvidenceSpark extends GATKSparkTool {
                 .collect();
 
         broadcastQNamesMultiMap.destroy();
-        BwaMemIndexSingleton.closeAllDistributedInstances(ctx);
+        BwaMemIndexCache.closeAllDistributedInstances(ctx);
 
         return intervalDispositions;
     }
@@ -458,7 +457,7 @@ public final class FindBreakpointEvidenceSpark extends GATKSparkTool {
             if ( fastqDir != null ) {
                 final String fastqName = String.format("%s/assembly%06d.fastq",fastqDir,intervalAndReads._1());
                 final ArrayList<FastqRead> sortedReads = new ArrayList<>(intervalAndReads._2());
-                sortedReads.sort(Comparator.comparing(FastqRead::getName));
+                sortedReads.sort(Comparator.comparing(FastqRead::getDescriptor));
                 SVFastqUtils.writeFastqFile(fastqName, pipelineOptions, sortedReads.iterator());
             }
             final FermiLiteAssembly assembly = new FermiLiteAssembler().createAssembly(readsList);
@@ -475,7 +474,7 @@ public final class FindBreakpointEvidenceSpark extends GATKSparkTool {
                     assembly.getContigs().stream()
                             .map(FermiLiteAssembly.Contig::getSequence)
                             .collect(SVUtils.arrayListCollector(assembly.getNContigs()));
-            try ( final BwaMemAligner aligner = new BwaMemAligner(BwaMemIndexSingleton.getInstance(alignerIndexFile)) ) {
+            try ( final BwaMemAligner aligner = new BwaMemAligner(BwaMemIndexCache.getInstance(alignerIndexFile)) ) {
                 aligner.setIntraCtgOptions();
                 final List<List<BwaMemAlignment>> alignments = aligner.alignSeqs(tigSeqs);
                 return new AlignedAssemblyOrExcuse(intervalAndReads._1(), assembly, alignments);

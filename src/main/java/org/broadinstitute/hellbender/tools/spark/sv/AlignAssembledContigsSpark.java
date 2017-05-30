@@ -8,7 +8,7 @@ import org.broadinstitute.barclay.argparser.CommandLineProgramProperties;
 import org.broadinstitute.hellbender.cmdline.StandardArgumentDefinitions;
 import org.broadinstitute.hellbender.cmdline.programgroups.StructuralVariationSparkProgramGroup;
 import org.broadinstitute.hellbender.engine.spark.GATKSparkTool;
-import org.broadinstitute.hellbender.utils.bwa.BwaMemIndexSingleton;
+import org.broadinstitute.hellbender.utils.bwa.BwaMemIndexCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public final class AlignAssembledContigsSpark extends GATKSparkTool {
                 });
                 return results.iterator();});
         allContigAlignments.saveAsTextFile(output);
-        BwaMemIndexSingleton.closeAllDistributedInstances(ctx);
+        BwaMemIndexCache.closeAllDistributedInstances(ctx);
     }
 
 }

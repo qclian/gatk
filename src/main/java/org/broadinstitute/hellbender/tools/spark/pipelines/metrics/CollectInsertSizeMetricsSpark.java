@@ -23,7 +23,7 @@ import java.util.List;
         oneLineSummary = "Collect Insert Size Distribution on Spark",
         programGroup   = SparkProgramGroup.class)
 @DocumentedFeature
-public final class CollectInsertSizeMetricsSpark
+    public final class CollectInsertSizeMetricsSpark
         extends MetricsCollectorSparkTool<InsertSizeMetricsArgumentCollection> {
 
     private static final long serialVersionUID = 1L;

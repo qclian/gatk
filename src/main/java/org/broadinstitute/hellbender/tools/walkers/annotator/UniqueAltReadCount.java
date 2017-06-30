@@ -20,13 +20,17 @@ import java.util.stream.Collectors;
  * have the profile where the evidence for alternate allele comes solely from one, two, or three sets of apparent PCR-duplicates.
  * Reads in such a set have the same read-start and mate-end position i.e. they come from the same original insert.
  * Normally, they are marked as duplicates by Picard MarkDuplicates. But when we use unique molecular identifiers (UMIs),
- * these apparent PCR-duplicate reads may get different UMIs, and hence these reads are regarded independent evidence.
+ * these apparent PCR-duplicate reads may get different UMIs, and hence to Mutect these reads appear as
+ * independent evidence for ALT allele.
  *
  * Although these reads have different UMIs, we suspect that they really are PCR-duplicates, for two reasons:
  * 1) these sites are false positives, and
- * 2) with hybrid selection, it's highly unlikely that we get multiple fragments with identical start and end positions.
+ * 2) with hybrid selection, it's highly unlikely that we sequence multiple fragments with identical start and end positions.
  *
- * We don't understand why these apparent PCR-duplicates get different UMIs; investigation is underway.
+ * We now believe that these duplicates are the result of a false-priming event that occurs during PCR amplification.
+ * We suspect that during amplification excess adapter remains after the ligation step and fails to be completely
+ * cleaned up during SPRI. This excess adapter is thought to act as a PCR primer during amplification, which leads to
+ * the synthesis of a molecule with the wrong UMI.
  *
  * We filter the variant if the count is lower than a user-specified threshold.
  * Mutect2FilteringEngine::applyDuplicatedAltReadFilter is the accompanying filter.

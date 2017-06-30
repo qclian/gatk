@@ -191,8 +191,8 @@ public class Mutect2FilteringEngine {
         }
     }
 
-    // This filter checks for the case in which PCR-duplicates with unique UMIs (which we assume is caused by barcode swap)
-    // amplify the erroneous signal for an alternate allele
+    // This filter checks for the case in which PCR-duplicates with unique UMIs (which we assume is caused by false adapter priming)
+    // amplify the erroneous signal for an alternate allele.
     private void applyDuplicatedAltReadFilter(final M2FiltersArgumentCollection MTFAC, final VariantContext vc, final Collection<String> filters) {
         Genotype tumorGenotype = vc.getGenotype(tumorSample);
 
